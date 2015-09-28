@@ -24,9 +24,7 @@ def scrape_list():
         # pdb.set_trace()
         url_match = re.search(r'href="([^"]+);', str(row))
 
-
-
-        matches = re.search(r';id=(.+)">([^,]+),\s([^<]+)<', str(row))
+        matches = re.search(r';id=(.+)">([^,]+),\s([^<]+)<\/a><\/td><td width="\d+">([^<]+)<\/td><td width="\d+">([^<]+)', str(row))
 
         id_ = matches.group(1)
         family_name = matches.group(2)
@@ -36,15 +34,17 @@ def scrape_list():
 
         # image = scrape_person(person_url)
 
+        group = matches.group(4)
+        constituency = matches.group(5)
 
-        
         data = {
            'id': id_,
            'name': name,
            'given_name': given_name,
            'family_name': family_name,
            'source': person_url,
-
+           'group': group,
+           'constituency': constituency,
         }
         print data
         # scraperwiki.sql.save(unique_keys=['id'], data=data)
