@@ -20,23 +20,26 @@ def scrape_list():
 
     for row in rows:
         # pdb.set_trace()
-        url_match = re.search(r'href="([^"]+)"', str(row))
-
+        # print row
+        url_match = re.search(r'href="(?P<url>.+;id=(?P<id>[^"]+))"', str(row))
+        # print url_match
         # matches = re.search(r';id=(.+)">([^,]+),\s([^<]+)<\/a><\/td><td width="\d+">([^<]+)<\/td><td width="\d+">([^<]+)', str(row))
 
         # id_ = matches.group(1)
         # family_name = matches.group(2)
         # given_name = matches.group(3)
         # name = given_name + " " + family_name
-        person_url = (base_url + url_match.group(1)).replace('&amp;', '&')
+        person_url = (base_url + url_match.group('url')).replace('&amp;', '&')
+        print "fetching: ", person_url
 
+        id_ = url_match.group('id')
         # image = scrape_person(person_url)
 
         # faction = matches.group(4)
         # constituency = matches.group(5)
 
         data = {
-           # 'id': id_,
+           'id': id_,
            # 'name': name,
            # 'given_name': given_name,
            # 'family_name': family_name,
@@ -44,7 +47,7 @@ def scrape_list():
            # 'faction': group,
            # 'constituency': constituency,
         }
-        print data
+        print data, "\n"
         scraperwiki.sql.save(unique_keys=['id'], data=data)
 
 scrape_list()
