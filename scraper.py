@@ -5,10 +5,9 @@ import re
 import scraperwiki
 import pdb
 
-def scrape_person(person_url):
-    page = urlopen(person_url)
-    soup = BeautifulSoup(page)
-
+# def scrape_person(person_url):
+#     page = urlopen(person_url)
+#     soup = BeautifulSoup(page)
 
 
 def scrape_list():
@@ -20,35 +19,33 @@ def scrape_list():
     rows = soup.findAll("tr", { "class" : "trBgOff",  "class": "trBgOn"})
 
     for row in rows:
-        # print row
         # pdb.set_trace()
-        url_match = re.search(r'href="([^"]+);', str(row))
+        url_match = re.search(r'href="([^"]+)"', str(row))
 
-        matches = re.search(r';id=(.+)">([^,]+),\s([^<]+)<\/a><\/td><td width="\d+">([^<]+)<\/td><td width="\d+">([^<]+)', str(row))
+        # matches = re.search(r';id=(.+)">([^,]+),\s([^<]+)<\/a><\/td><td width="\d+">([^<]+)<\/td><td width="\d+">([^<]+)', str(row))
 
-        id_ = matches.group(1)
-        family_name = matches.group(2)
-        given_name = matches.group(3)
-        name = given_name + " " + family_name
-        person_url = base_url + url_match.group(1)
+        # id_ = matches.group(1)
+        # family_name = matches.group(2)
+        # given_name = matches.group(3)
+        # name = given_name + " " + family_name
+        person_url = (base_url + url_match.group(1)).replace('&amp;', '&')
 
         # image = scrape_person(person_url)
 
-        group = matches.group(4)
-        constituency = matches.group(5)
+        # faction = matches.group(4)
+        # constituency = matches.group(5)
 
         data = {
-           'id': id_,
-           'name': name,
-           'given_name': given_name,
-           'family_name': family_name,
+           # 'id': id_,
+           # 'name': name,
+           # 'given_name': given_name,
+           # 'family_name': family_name,
            'source': person_url,
-           'group': group,
-           'constituency': constituency,
+           # 'faction': group,
+           # 'constituency': constituency,
         }
         print data
-        # scraperwiki.sql.save(unique_keys=['id'], data=data)
-
+        scraperwiki.sql.save(unique_keys=['id'], data=data)
 
 scrape_list()
     
