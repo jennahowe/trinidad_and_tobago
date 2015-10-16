@@ -16,7 +16,7 @@ def scrape_list():
     page = urlopen(list_url)
     soup = BeautifulSoup(page)
 
-    rows = soup.findAll("tr", { "class" : "trBgOff",  "class": "trBgOn"})
+    rows = soup.findAll("tr", { "class" : ["trBgOff", "trBgOn"]})
 
     for row in rows:
         # pdb.set_trace()
