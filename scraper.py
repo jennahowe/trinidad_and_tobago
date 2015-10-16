@@ -31,17 +31,18 @@ def scrape_list():
         id_ = url_match.group('id')
         faction = re.search(r'<td width="140">(?P<faction>.*)</td>', str(row)).group('faction')
         constituency = re.search(r'<td width="200">(?P<constituency>.*)</td>', str(row)).group('constituency')
-
+        name = re.search(r'">(?P<name>.+)</a>', str(row)).group('name')
+        name = name.split(', ')
+        family_name = name[0]
+        given_name = name[1]
+        name = "%s %s" % (name[1], name[0])
         # image = scrape_person(person_url)
-
-        # faction = matches.group(4)
-        # constituency = matches.group(5)
 
         data = {
            'id': id_,
-           # 'name': name,
-           # 'given_name': given_name,
-           # 'family_name': family_name,
+           'name': name,
+           'given_name': given_name,
+           'family_name': family_name,
            'source': person_url,
            'faction': faction,
            'constituency': constituency,
