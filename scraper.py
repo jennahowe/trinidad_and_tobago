@@ -19,11 +19,7 @@ def scrape_list():
     rows = soup.findAll("tr", { "class" : ["trBgOff", "trBgOn"]})
 
     for row in rows:
-        # pdb.set_trace()
-        # print row
         url_match = re.search(r'href="(?P<url>.+;id=(?P<id>[^"]+))"', str(row))
-        # print url_match
-        # matches = re.search(r';id=(.+)">([^,]+),\s([^<]+)<\/a><\/td><td width="\d+">([^<]+)<\/td><td width="\d+">([^<]+)', str(row))
 
         # id_ = matches.group(1)
         # family_name = matches.group(2)
@@ -33,6 +29,9 @@ def scrape_list():
         print "fetching: ", person_url
 
         id_ = url_match.group('id')
+        faction = re.search(r'<td width="140">(?P<faction>.*)</td>', str(row)).group('faction')
+        constituency = re.search(r'<td width="200">(?P<constituency>.*)</td>', str(row)).group('constituency')
+
         # image = scrape_person(person_url)
 
         # faction = matches.group(4)
@@ -44,8 +43,8 @@ def scrape_list():
            # 'given_name': given_name,
            # 'family_name': family_name,
            'source': person_url,
-           # 'faction': group,
-           # 'constituency': constituency,
+           'faction': faction,
+           'constituency': constituency,
         }
         print data, "\n"
         scraperwiki.sql.save(unique_keys=['id'], data=data)
