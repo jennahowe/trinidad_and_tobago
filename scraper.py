@@ -54,7 +54,7 @@ def scrape_list():
            'image': image,
         }
         print data, "\n"
-        scraperwiki.sql.save(unique_keys=['id'], data=data)
+        scraperwiki.sql.save(unique_keys=['id'], data=data, table_name='house_of_representatives')
 
         time.sleep(sleep_between_requests)
 
