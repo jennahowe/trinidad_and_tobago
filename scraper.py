@@ -10,6 +10,7 @@ sleep_between_requests = 5 # (seconds)
 base_url = "http://ttparliament.org"
 reps_url = base_url + "/members.php?mid=54"
 senate_url = base_url + "/members.php?mid=55"
+term = "11th Republican Parliament" # Can't be scraped from anywhere
 
 def scrape_person(person_url):
     page = urlopen(person_url)
@@ -33,10 +34,12 @@ def scrape_list(url, house):
         print "fetching: ", person_url
 
         id_ = url_match.group('id')
-        faction = re.search(r'<td width="140">(?P<faction>.*)</td>', str(row)).group('faction')
+        faction = (re.search(r'<td width="140">(?P<faction>.*)</td>', str(row))
+                    .group('faction'))
 
         if house == "reps":
-            constituency = re.search(r'<td width="200">(?P<constituency>.*)</td>', str(row)).group('constituency')
+            constituency = re.search(r'<td width="200">(?P<constituency>.*)</td>',
+                                     str(row)).group('constituency')
 
         name = re.search(r'">(?P<name>.+)</a>', str(row)).group('name')
         name = name.split(', ')
@@ -46,21 +49,7 @@ def scrape_list(url, house):
         name = "%s %s" % (name[1], name[0])
         image = base_url + scrape_person(person_url)
 
-        if house == "reps":
-            table_name = 'house_of_representatives'
-            data = {
-               'id': id_,
-               'name': name,
-               'given_name': given_name,
-               'family_name': family_name,
-               'source': person_url,
-               'faction': faction,
-               'constituency': constituency,
-               'image': image,
-            }
-        elif house == "senate":
-            table_name = 'senate'
-            data = {
+        data = {
                'id': id_,
                'name': name,
                'given_name': given_name,
@@ -68,10 +57,20 @@ def scrape_list(url, house):
                'source': person_url,
                'faction': faction,
                'image': image,
+               'term': term
             }
 
+        if house == "reps":
+            data['constituency'] = constituency
+            table_name = 'house_of_representatives'
+
+        elif house == "senate":
+            table_name = 'senate'
+
+
         print data, "\n"
-        scraperwiki.sql.save(unique_keys=['id'], data=data, table_name=table_name)
+        scraperwiki.sql.save(unique_keys=['id'], data=data, 
+                             table_name=table_name)
 
         time.sleep(sleep_between_requests)
 
