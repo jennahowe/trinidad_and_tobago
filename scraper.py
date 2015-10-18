@@ -21,7 +21,6 @@ def scrape_person(person_url):
     return image
     
 def scrape_list(url, house):
-    pdb.set_trace()
     page = urlopen(url)
     soup = BeautifulSoup(page)
 
