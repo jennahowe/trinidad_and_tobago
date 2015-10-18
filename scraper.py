@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
-from urllib import urlretrieve
 import re
 import scraperwiki
 import pdb
@@ -8,8 +7,8 @@ import time
 
 sleep_between_requests = 5 # (seconds)
 base_url = "http://ttparliament.org"
-reps_url = base_url + "/members.php?mid=54"
-senate_url = base_url + "/members.php?mid=55"
+current_reps_url = base_url + "/members.php?mid=54"
+current_senate_url = base_url + "/members.php?mid=55"
 term = "11th Republican Parliament" # Can't be scraped from anywhere
 
 def scrape_person(person_url):
@@ -20,8 +19,39 @@ def scrape_person(person_url):
     image = re.search(r'src="(?P<url>.+)"\s', str(image)).group('url')
 
     return image
+
+def split_name(name):
+    name = name.split(', ')
+
+    family_name = name[0]
+    given_name = name[1]
+    name = "%s %s" % (name[1], name[0])
+
+    return (name, given_name, family_name)
+
+def create_entry(id_='', name='', source='', faction='', image='', 
+              constituency=False, term=''):
+    name, given_name, family_name = split_name(name)
+
+    data = {
+               'id': id_,
+               'name': name,
+               'given_name': given_name,
+               'family_name': family_name,
+               'source': source,
+               'faction': faction,
+               'image': image,
+               'term': term
+            }
+    if constituency:
+        data['constituency'] = constituency
+
+    return data
+
+# def scrape_past():
+
     
-def scrape_list(url, house):
+def scrape_current(url, house):
     page = urlopen(url)
     soup = BeautifulSoup(page)
 
@@ -42,30 +72,21 @@ def scrape_list(url, house):
                                      str(row)).group('constituency')
 
         name = re.search(r'">(?P<name>.+)</a>', str(row)).group('name')
-        name = name.split(', ')
-
-        family_name = name[0]
-        given_name = name[1]
-        name = "%s %s" % (name[1], name[0])
         image = base_url + scrape_person(person_url)
 
-        data = {
-               'id': id_,
-               'name': name,
-               'given_name': given_name,
-               'family_name': family_name,
-               'source': person_url,
-               'faction': faction,
-               'image': image,
-               'term': term
-            }
-
         if house == "reps":
-            data['constituency'] = constituency
             table_name = 'house_of_representatives'
+            data = create_entry(id_=id_, name=name, source=person_url,
+                                faction=faction, image=image,
+                                constituency=constituency, term=term, 
+                                )
+
 
         elif house == "senate":
             table_name = 'senate'
+            data = create_entry(id_=id_, name=name, source=person_url,
+                                faction=faction, image=image, term=term, 
+                                )
 
 
         print data, "\n"
@@ -74,5 +95,5 @@ def scrape_list(url, house):
 
         time.sleep(sleep_between_requests)
 
-scrape_list(reps_url, "reps")
-scrape_list(senate_url, "senate")
+# scrape_current(current_reps_url, "reps")
+scrape_current(current_senate_url, "senate")
